@@ -5,6 +5,7 @@
   "main": "app/main/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm run start:render\" \"wait-on http://localhost:3000 && npm run start:main\"",
     "start:main": "electron .",
     "start:render": "cd app/render/src/main && npm start",
     "build": "webpack --config webpack.prod.js"
@@ -20,7 +21,9 @@
   },
   "homepage": "https://github.com/xinyuehtx/RemoteView#readme",
   "devDependencies": {
-    "electron-is-dev": "^1.2.0"
+    "concurrently": "^5.2.0",
+    "electron-is-dev": "^1.2.0",
+    "wait-on": "^5.0.0"
   },
   "dependencies": {
     "electron": "^9.0.2",
