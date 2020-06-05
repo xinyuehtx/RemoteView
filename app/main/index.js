@@ -12,3 +12,5 @@ app.on('ready', () => {
 
     handleIPC();
 });
+
+app.allowRendererProcessReuse=false;
