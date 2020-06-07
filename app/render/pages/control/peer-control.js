@@ -2,13 +2,7 @@ const EventEmitter = require('events');
 const peer = new EventEmitter();
 const { ipcRenderer, desktopCapturer } = require('electron');
 
-peer.on('robot', (type, data) => {
-    if (type === 'mouse') {
-        data.screen = { width: window.screen.width, height: window.screen.height }
-    }
 
-    ipcRenderer.send('robot', type, data);
-});
 const pc = new window.RTCPeerConnection();
 
 pc.onicecandidate = function (e) {
@@ -16,6 +10,15 @@ pc.onicecandidate = function (e) {
         ipcRenderer.send('forward', 'control-candidate', e.candidate)
     }
 }
+
+const dc = pc.createDataChannel('robotchannel', { reliable: false });
+dc.onopen = function () {
+    peer.on('robot', (type, data) => {
+        dc.send(JSON.stringify({ type, data }))
+    })
+}
+
+
 
 ipcRenderer.on('candidate', (e, candidate) => {
     addIceCandidate(candidate);

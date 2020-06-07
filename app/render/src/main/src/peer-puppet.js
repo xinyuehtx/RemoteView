@@ -25,7 +25,17 @@ async function getScreenStream() {
 }
 
 let pc = new window.RTCPeerConnection()
+pc.ondatachannel = e => {
+    e.channel.onmessage = e => {
+        let { type, data } = JSON.parse(e.data);
 
+        if (type === 'mouse') {
+            data.screen = { width: window.screen.width, height: window.screen.height }
+        }
+
+        ipcRenderer.send('robot', type, data);
+    }
+}
 
 pc.onicecandidate = function (e) {
     if (e.candidate) {
