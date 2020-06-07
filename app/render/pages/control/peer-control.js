@@ -12,24 +12,29 @@ peer.on('robot', (type, data) => {
 const pc = new window.RTCPeerConnection();
 
 pc.onicecandidate = function (e) {
-    console.log('candidate', JSON.stringify(e.candidate))
+    if (e.candidate) {
+        ipcRenderer.send('forward', 'control-candidate', e.candidate)
+    }
 }
 
-let candidates=[];
+ipcRenderer.on('candidate', (e, candidate) => {
+    addIceCandidate(candidate);
+})
+
+let candidates = [];
 
 async function addIceCandidate(candidate) {
-    if(candidate){
+    if (candidate) {
         candidates.push(candidate);
     }
     if (pc.remoteDescription && pc.remoteDescription.type) {
-        for(let can of candidates){
+        for (let can of candidates) {
             await pc.addIceCandidate(new RTCIceCandidate(can))
         }
-        candidates=[];
+        candidates = [];
     }
 }
 
-window.addIceCandidate=addIceCandidate;
 
 async function createOffer() {
     const offer = await pc.createOffer({
@@ -41,11 +46,17 @@ async function createOffer() {
     console.log('pc offer', JSON.stringify(offer));
     return pc.localDescription;
 }
-createOffer();
+createOffer().then(offer => {
+    ipcRenderer.send('forward', 'offer', { type: offer.type, sdp: offer.sdp });
+})
 async function setRemote(answer) {
     await pc.setRemoteDescription(answer);
 }
-window.setRemote = setRemote;
+
+ipcRenderer.on('answer', (e, answer) => {
+    setRemote(answer);
+})
+
 pc.onaddstream = (e) => {
     peer.emit('add-stream', e.stream);
 }

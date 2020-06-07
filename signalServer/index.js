@@ -30,7 +30,9 @@ wss.on('connection', (ws, req) => {
             let remote = +data.remote;
             if (code2ws.has(remote)) {
                 ws.sendData('controlled', { remote });
-                ws.sendRemote = code2ws.get(remote).sendData;
+                let remoteWS = code2ws.get(remote)
+                ws.sendRemote = remoteWS.sendData
+                remoteWS.sendRemote = ws.sendData
                 ws.sendRemote('be-controlled', { remote: code })
             }
         }
@@ -44,6 +46,7 @@ wss.on('connection', (ws, req) => {
 
     ws.on('close', (code) => {
         code2ws.delete(code);
+        delete ws.sendRemote
         clearTimeout(ws._closeTimeout)
     });
 
