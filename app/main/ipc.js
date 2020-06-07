@@ -11,7 +11,16 @@ module.exports = function () {
     })
 
     ipcMain.on('control', async (e, remoteCode) => {
-        sendMainWindow('control-state-change', remoteCode, 1);
+        signal.send('control',{remote:remoteCode})
+        
+    })
+
+    signal.on('controlled',(data)=>{
+        sendMainWindow('control-state-change', data.remote, 1);
         createControlWindow();
+    })
+
+    signal.on('be-controlled',(data)=>{
+        sendMainWindow('control-state-change', data.remote, 2);
     })
 }
