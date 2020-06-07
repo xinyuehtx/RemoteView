@@ -11,6 +11,5 @@ app.on('ready', () => {
     createControlWindow();
 
     handleIPC();
+    require('./robot.js')();
 });
-
-app.allowRendererProcessReuse=false;

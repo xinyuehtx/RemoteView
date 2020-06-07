@@ -8,6 +8,7 @@
     "start": "concurrently \"npm run start:render\" \"wait-on http://localhost:3000 && npm run start:main\"",
     "start:main": "electron .",
     "start:render": "cd app/render/src/main && npm start",
+    "rebuild": "electron-rebuild",
     "build": "webpack --config webpack.prod.js"
   },
   "repository": {
@@ -29,6 +30,7 @@
   "dependencies": {
     "electron": "^9.0.2",
     "electron-is-dev": "^1.2.0",
-    "robotjs": "^0.6.0"
+    "robotjs": "^0.6.0",
+    "vkey": "^1.0.1"
   }
 }
