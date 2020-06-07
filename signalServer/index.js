@@ -7,8 +7,11 @@ wss.on('connection', (ws, req) => {
     code2ws.set(code, ws);
 
     ws.sendData = (event, data) => {
-        ws.send(JSON.stringify({ event, data }));
-    }
+        ws.send(JSON.stringify({event, data}));
+    };
+    ws.sendError = msg => {
+        ws.sendData('error', {msg})
+    };
     ws.on('message', function incoming(message) {
         console.log('imcoming', message);
         let parsedMessage = {};
@@ -21,8 +24,8 @@ wss.on('connection', (ws, req) => {
 
         let { event, data } = parsedMessage;
         if (event === 'login') {
-            ws.sendData('logined', { code })
-        }
+            ws.sendData( 'logined', {code})
+        } 
         else if (event === 'control') {
             let remote = +data.remote;
             if (code2ws.has(remote)) {
@@ -33,6 +36,9 @@ wss.on('connection', (ws, req) => {
         }
         else if (event === 'forward') {
             ws.sendRemote(data.event, data.data)
+        }
+        else {
+            ws.sendError('message not handle', message)
         }
     });
 
